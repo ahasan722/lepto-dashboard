@@ -1,0 +1,101 @@
+Date,Region,Province,City/Mun,No. of ICU beds Occupied due to Lepto,No. of ICU beds Occupied due to Other diseases,No. of Non-ICU Beds Occupied due to Lepto,No. of Non-ICU Beds Occupied due to Other diseases,Died,Total ICU beds occupied,Total Non-ICU beds occupied,Total beds occupied,% Died
+2024-09-19,Region III (Central Luzon),Aurora,Baler,2,6,12,38,1,8,50,58,1.72
+2025-04-09,Region III (Central Luzon),Aurora,Casiguran,0,1,3,31,1,1,34,35,2.86
+2025-08-26,Region III (Central Luzon),Aurora,Dilasag,5,7,22,37,0,12,59,71,0.0
+2025-07-31,Region III (Central Luzon),Bataan,Balanga,1,5,9,1,0,6,10,16,0.0
+2025-11-19,Region III (Central Luzon),Pampanga,San Fernando,3,1,24,37,0,4,61,65,0.0
+2025-02-27,Region III (Central Luzon),Pampanga,Mabalacat,10,5,15,23,5,15,38,53,9.43
+2025-06-29,Region III (Central Luzon),Aurora,Dilasag,4,10,20,38,5,14,58,72,6.94
+2025-02-23,Region III (Central Luzon),Nueva Ecija,Cabanatuan,8,7,4,44,0,15,48,63,0.0
+2025-04-13,Region III (Central Luzon),Aurora,Dinalungan,1,15,10,50,5,16,60,76,6.58
+2025-07-27,Region III (Central Luzon),Pampanga,Mabalacat,10,14,17,37,4,24,54,78,5.13
+2025-07-02,Region III (Central Luzon),Bulacan,City V,7,2,0,8,3,9,8,17,17.65
+2025-02-21,Region III (Central Luzon),Nueva Ecija,Gapan,5,14,16,48,5,19,64,83,6.02
+2024-10-06,Region III (Central Luzon),Aurora,Baler,7,7,26,27,0,14,53,67,0.0
+2025-03-15,Region III (Central Luzon),Nueva Ecija,San Jose,3,14,10,4,2,17,14,31,6.45
+2025-06-11,Region III (Central Luzon),Nueva Ecija,Palayan,5,19,25,35,1,24,60,84,1.19
+2024-11-09,Region III (Central Luzon),Aurora,Dingalan,7,7,10,15,1,14,25,39,2.56
+2025-04-14,Region III (Central Luzon),Bulacan,City Z,4,0,12,19,0,4,31,35,0.0
+2024-11-08,Region III (Central Luzon),Nueva Ecija,Gapan,9,10,18,2,4,19,20,39,10.26
+2025-10-12,Region III (Central Luzon),Nueva Ecija,Cabanatuan,8,12,7,11,4,20,18,38,10.53
+2024-12-03,Region III (Central Luzon),Pampanga,Apalit,8,7,21,47,5,15,68,83,6.02
+2025-06-29,Region III (Central Luzon),Aurora,Dinalungan,7,3,15,2,0,10,17,27,0.0
+2025-08-20,Region III (Central Luzon),Aurora,Baler,2,18,20,24,1,20,44,64,1.56
+2025-09-24,Region III (Central Luzon),Aurora,Dinalungan,5,8,8,20,4,13,28,41,9.76
+2025-05-19,Region III (Central Luzon),Bulacan,City X,0,14,2,2,0,14,4,18,0.0
+2025-02-01,Region III (Central Luzon),Pampanga,Apalit,10,15,9,34,2,25,43,68,2.94
+2025-08-19,Region III (Central Luzon),Bulacan,City W,6,12,5,49,1,18,54,72,1.39
+2025-05-02,Region III (Central Luzon),Bulacan,City Z,6,2,24,24,4,8,48,56,7.14
+2025-03-06,Region III (Central Luzon),Bataan,Bagac,10,17,24,15,0,27,39,66,0.0
+2025-06-27,Region III (Central Luzon),Aurora,Dilasag,8,8,27,48,3,16,75,91,3.3
+2025-04-16,Region III (Central Luzon),Bataan,Bagac,3,13,25,42,3,16,67,83,3.61
+2025-08-23,Region III (Central Luzon),Bataan,Dinalupihan,8,3,26,43,2,11,69,80,2.5
+2025-10-27,Region III (Central Luzon),Bataan,Dinalupihan,8,14,14,0,4,22,14,36,11.11
+2024-11-05,Region III (Central Luzon),Nueva Ecija,San Antonio,3,2,9,33,1,5,42,47,2.13
+2024-12-02,Region III (Central Luzon),Bulacan,City V,6,10,17,5,0,16,22,38,0.0
+2025-12-10,Region III (Central Luzon),Bulacan,City V,6,1,3,25,0,7,28,35,0.0
+2025-08-03,Region III (Central Luzon),Aurora,Baler,5,17,4,10,4,22,14,36,11.11
+2024-11-24,Region III (Central Luzon),Bulacan,City Z,10,11,22,31,3,21,53,74,4.05
+2024-09-07,Region III (Central Luzon),Aurora,Dilasag,4,8,25,19,1,12,44,56,1.79
+2025-12-24,Region III (Central Luzon),Bulacan,City W,7,10,20,49,5,17,69,86,5.81
+2025-01-19,Region III (Central Luzon),Bataan,Bagac,10,0,25,21,3,10,46,56,5.36
+2024-09-06,Region III (Central Luzon),Bulacan,City V,6,10,6,21,5,16,27,43,11.63
+2025-07-17,Region III (Central Luzon),Bataan,Abucay,7,6,3,17,2,13,20,33,6.06
+2025-09-22,Region III (Central Luzon),Bataan,Dinalupihan,6,5,0,16,1,11,16,27,3.7
+2025-11-29,Region III (Central Luzon),Bulacan,Malolos,1,20,13,9,3,21,22,43,6.98
+2025-06-04,Region III (Central Luzon),Nueva Ecija,Cabanatuan,10,9,25,44,1,19,69,88,1.14
+2025-10-31,Region III (Central Luzon),Pampanga,San Fernando,6,13,13,23,3,19,36,55,5.45
+2025-04-17,Region III (Central Luzon),Pampanga,Macabebe,5,19,8,14,5,24,22,46,10.87
+2025-05-01,Region III (Central Luzon),Aurora,Casiguran,2,16,2,48,5,18,50,68,7.35
+2025-04-27,Region III (Central Luzon),Bulacan,City X,2,18,30,43,2,20,73,93,2.15
+2025-10-20,Region III (Central Luzon),Bataan,Dinalupihan,1,8,6,5,5,9,11,20,25.0
+2025-10-17,Region III (Central Luzon),Pampanga,San Fernando,5,3,27,33,2,8,60,68,2.94
+2025-12-11,Region III (Central Luzon),Bulacan,City X,1,20,27,11,4,21,38,59,6.78
+2025-07-20,Region III (Central Luzon),Pampanga,Magalang,10,14,25,7,4,24,32,56,7.14
+2025-04-25,Region III (Central Luzon),Nueva Ecija,Cabanatuan,2,2,24,29,5,4,53,57,8.77
+2025-11-22,Region III (Central Luzon),Bulacan,City X,5,4,5,15,4,9,20,29,13.79
+2025-02-23,Region III (Central Luzon),Bataan,Hermosa,8,0,17,12,0,8,29,37,0.0
+2025-03-17,Region III (Central Luzon),Bataan,Balanga,8,9,25,16,4,17,41,58,6.9
+2025-08-07,Region III (Central Luzon),Aurora,Dinalungan,6,12,1,33,0,18,34,52,0.0
+2025-07-24,Region III (Central Luzon),Aurora,Dingalan,3,2,30,41,4,5,71,76,5.26
+2025-01-17,Region III (Central Luzon),Bataan,Hermosa,2,15,12,6,5,17,18,35,14.29
+2025-08-29,Region III (Central Luzon),Aurora,Dinalungan,1,16,2,36,0,17,38,55,0.0
+2025-01-08,Region III (Central Luzon),Bataan,Hermosa,4,1,15,45,2,5,60,65,3.08
+2025-03-29,Region III (Central Luzon),Nueva Ecija,Palayan,6,18,15,29,5,24,44,68,7.35
+2025-02-11,Region III (Central Luzon),Bulacan,Malolos,5,0,7,10,4,5,17,22,18.18
+2025-05-19,Region III (Central Luzon),Bataan,Hermosa,0,11,13,27,2,11,40,51,3.92
+2025-03-10,Region III (Central Luzon),Aurora,Casiguran,0,1,30,50,5,1,80,81,6.17
+2025-12-29,Region III (Central Luzon),Bulacan,City V,9,20,24,15,0,29,39,68,0.0
+2025-03-06,Region III (Central Luzon),Pampanga,Mabalacat,10,18,6,28,2,28,34,62,3.23
+2025-09-11,Region III (Central Luzon),Bataan,Balanga,10,5,11,21,3,15,32,47,6.38
+2025-05-16,Region III (Central Luzon),Bulacan,Malolos,9,4,11,1,3,13,12,25,12.0
+2024-12-05,Region III (Central Luzon),Pampanga,Apalit,6,3,7,3,1,9,10,19,5.26
+2025-02-07,Region III (Central Luzon),Nueva Ecija,San Antonio,4,9,9,36,2,13,45,58,3.45
+2025-06-20,Region III (Central Luzon),Pampanga,Magalang,3,9,21,7,5,12,28,40,12.5
+2025-08-30,Region III (Central Luzon),Aurora,Baler,9,11,10,25,3,20,35,55,5.45
+2025-09-27,Region III (Central Luzon),Nueva Ecija,San Antonio,6,8,0,14,1,14,14,28,3.57
+2024-09-08,Region III (Central Luzon),Nueva Ecija,Cabanatuan,0,5,2,6,0,5,8,13,0.0
+2025-11-15,Region III (Central Luzon),Bulacan,Malolos,2,13,16,42,5,15,58,73,6.85
+2025-06-11,Region III (Central Luzon),Pampanga,Macabebe,6,2,11,32,4,8,43,51,7.84
+2025-02-14,Region III (Central Luzon),Pampanga,San Fernando,9,4,2,22,5,13,24,37,13.51
+2025-04-20,Region III (Central Luzon),Nueva Ecija,Gapan,7,16,17,0,2,23,17,40,5.0
+2024-11-05,Region III (Central Luzon),Aurora,Dilasag,9,19,11,34,1,28,45,73,1.37
+2025-08-26,Region III (Central Luzon),Nueva Ecija,Gapan,0,3,17,8,0,3,25,28,0.0
+2025-03-23,Region III (Central Luzon),Nueva Ecija,Cabanatuan,7,10,17,39,1,17,56,73,1.37
+2025-05-17,Region III (Central Luzon),Pampanga,San Fernando,1,3,14,39,3,4,53,57,5.26
+2024-11-07,Region III (Central Luzon),Nueva Ecija,Gapan,3,12,30,9,3,15,39,54,5.56
+2025-05-07,Region III (Central Luzon),Pampanga,Apalit,0,20,27,12,2,20,39,59,3.39
+2025-10-25,Region III (Central Luzon),Nueva Ecija,San Jose,9,10,2,42,4,19,44,63,6.35
+2025-08-05,Region III (Central Luzon),Bulacan,City W,3,13,10,24,0,16,34,50,0.0
+2025-12-16,Region III (Central Luzon),Bataan,Dinalupihan,6,5,13,8,4,11,21,32,12.5
+2025-02-13,Region III (Central Luzon),Aurora,Dinalungan,2,0,11,44,4,2,55,57,7.02
+2025-06-05,Region III (Central Luzon),Pampanga,Mabalacat,3,20,23,22,4,23,45,68,5.88
+2025-05-14,Region III (Central Luzon),Aurora,Dinalungan,0,0,29,37,0,0,66,66,0.0
+2025-04-25,Region III (Central Luzon),Bulacan,City V,6,19,5,24,2,25,29,54,3.7
+2025-08-17,Region III (Central Luzon),Bulacan,City X,1,4,21,28,1,5,49,54,1.85
+2025-10-31,Region III (Central Luzon),Aurora,Baler,7,5,18,30,5,12,48,60,8.33
+2025-04-07,Region III (Central Luzon),Bulacan,City V,1,7,8,30,1,8,38,46,2.17
+2025-10-20,Region III (Central Luzon),Pampanga,San Fernando,10,15,21,35,4,25,56,81,4.94
+2025-12-15,Region III (Central Luzon),Bataan,Dinalupihan,8,8,24,26,4,16,50,66,6.06
+2025-04-20,Region III (Central Luzon),Bulacan,City Z,5,9,13,38,2,14,51,65,3.08
+2025-02-19,Region III (Central Luzon),Bataan,Hermosa,10,20,30,37,3,30,67,97,3.09
