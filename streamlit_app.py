@@ -5,7 +5,19 @@ import plotly.express as px
 import datetime
 
 # -------------------- CONFIG --------------------
-st.set_page_config(page_title="Lepto Dashboard", layout="wide")
+st.set_page_config(page_title="Lepto Bed Dashboard", layout="wide")
+
+# Inject custom CSS for background
+st.markdown("""
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        .block-container {
+            padding-top: 2rem;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
 @st.cache_data
 def load_data():
@@ -19,7 +31,7 @@ df = load_data()
 
 # -------------------- LOGIN --------------------
 def login():
-    st.title("Lepto Bed Dashboard Login")
+    st.title("Login")
     with st.form("login_form"):
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
@@ -43,10 +55,10 @@ if not st.session_state.logged_in:
 # -------------------- NAVIGATION --------------------
 page = st.sidebar.radio("Navigate", ["Home", "Data Entry", "Trends", "Tables"])
 
-# Shared filters
+# Filters
 province_filter = st.sidebar.multiselect("Province", sorted(df["Province"].unique()))
 city_filter = st.sidebar.multiselect("City/Mun", sorted(df[df["Province"].isin(province_filter)]["City/Mun"].unique()) if province_filter else sorted(df["City/Mun"].unique()))
-disease_filter = st.sidebar.selectbox("Disease Type", ["All", "Lepto", "Other"])
+disease_filter = st.sidebar.selectbox("Disease Type", ["All", "Lepto Only", "Other Only"])
 aggregation = st.sidebar.selectbox("Aggregation", ["ISO Week", "7-Day Moving Average"])
 
 # Apply filters
@@ -56,12 +68,19 @@ def apply_filters(data):
         filtered = filtered[filtered["Province"].isin(province_filter)]
     if city_filter:
         filtered = filtered[filtered["City/Mun"].isin(city_filter)]
-    if disease_filter == "Lepto":
-        filtered = filtered[(filtered["No. of ICU beds Occupied due to Lepto"] > 0) | 
-                            (filtered["No. of Non-ICU Beds Occupied due to Lepto"] > 0)]
-    elif disease_filter == "Other":
-        filtered = filtered[(filtered["No. of ICU beds Occupied due to Other diseases"] > 0) | 
-                            (filtered["No. of Non-ICU Beds Occupied due to Other diseases"] > 0)]
+
+    if disease_filter == "Lepto Only":
+        filtered = filtered[
+            (filtered["No. of ICU beds Occupied due to Lepto"] > 0) &
+            (filtered["No. of ICU beds Occupied due to Other diseases"] == 0) &
+            (filtered["No. of Non-ICU Beds Occupied due to Other diseases"] == 0)
+        ]
+    elif disease_filter == "Other Only":
+        filtered = filtered[
+            (filtered["No. of ICU beds Occupied due to Other diseases"] > 0) &
+            (filtered["No. of ICU beds Occupied due to Lepto"] == 0) &
+            (filtered["No. of Non-ICU Beds Occupied due to Lepto"] == 0)
+        ]
     return filtered
 
 filtered_df = apply_filters(df)
@@ -69,12 +88,17 @@ filtered_df = apply_filters(df)
 # -------------------- HOME --------------------
 if page == "Home":
     st.title("Leptospirosis Bed Monitoring Dashboard")
-    st.write("Monitor ICU and Non-ICU bed usage across Central Luzon hospitals.")
+    st.write("A monitoring tool for ICU and Non-ICU bed usage in Central Luzon hospitals.")
 
     st.subheader("Summary Panel")
+    total_icu = int(filtered_df["Total ICU beds occupied"].sum())
+    total_deaths = int(filtered_df["Died"].sum())
+    total_beds = int(filtered_df["Total beds occupied"].sum())
+    mortality = round((total_deaths / total_beds) * 100, 2) if total_beds else 0
+
     col1, col2 = st.columns(2)
-    col1.metric("Current Total ICU Occupancy", int(filtered_df["Total ICU beds occupied"].sum()))
-    col2.metric("Current Mortality Rate", f"{filtered_df['% Died'].mean():.2f}%")
+    col1.metric("Total ICU Occupancy", total_icu)
+    col2.metric("Current Mortality Rate", f"{mortality:.2f}%")
 
 # -------------------- DATA ENTRY --------------------
 elif page == "Data Entry":
@@ -95,11 +119,11 @@ elif page == "Data Entry":
 
         submitted = st.form_submit_button("Submit")
         if submitted:
-            st.success("✅ Data submitted successfully (This version does not persist to file)")
+            st.success("✅ Data submitted (simulation only)")
 
 # -------------------- TRENDS --------------------
 elif page == "Trends":
-    st.title("ICU & Non-ICU Bed Trends")
+    st.title("Trends: Bed Occupancy and Deaths")
 
     if aggregation == "ISO Week":
         group = filtered_df.groupby("Week")[["Total ICU beds occupied", "Total Non-ICU beds occupied", "Died"]].sum().reset_index()
@@ -110,7 +134,7 @@ elif page == "Trends":
         group = df_temp.rolling("7D", min_periods=1).sum().reset_index()
         x = "Date"
 
-    st.subheader("ICU and Non-ICU Bed Occupancy Over Time")
+    st.subheader("ICU and Non-ICU Bed Occupancy")
     fig1 = px.line(group, x=x, y=["Total ICU beds occupied", "Total Non-ICU beds occupied"])
     fig1.update_layout(hovermode="x unified", xaxis=dict(rangeslider=dict(visible=True)))
     st.plotly_chart(fig1, use_container_width=True)
