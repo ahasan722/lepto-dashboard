@@ -7,7 +7,7 @@ import datetime
 # -------------------- CONFIG --------------------
 st.set_page_config(page_title="Lepto Bed Dashboard", layout="wide")
 
-# Inject custom CSS for background
+# Custom background styling
 st.markdown("""
     <style>
         body {
@@ -22,6 +22,11 @@ st.markdown("""
 @st.cache_data
 def load_data():
     df = pd.read_csv("STC-2502958-001.csv", parse_dates=["Date"])
+    # Split disease-specific totals
+    df["Lepto ICU"] = df["No. of ICU beds Occupied due to Lepto"]
+    df["Other ICU"] = df["No. of ICU beds Occupied due to Other diseases"]
+    df["Lepto Non-ICU"] = df["No. of Non-ICU Beds Occupied due to Lepto"]
+    df["Other Non-ICU"] = df["No. of Non-ICU Beds Occupied due to Other diseases"]
     df["ISO_Week"] = df["Date"].dt.isocalendar().week
     df["Year"] = df["Date"].dt.year
     df["Week"] = df["Year"].astype(str) + "-W" + df["ISO_Week"].astype(str)
@@ -38,7 +43,9 @@ def login():
         submitted = st.form_submit_button("Login")
         if submitted:
             if username == "STC-2502958-001" and password == "123456":
-                return True
+                st.session_state.logged_in = True
+                st.session_state.page = "Home"
+                st.experimental_rerun()
             else:
                 st.error("Invalid credentials")
                 return False
@@ -46,64 +53,93 @@ def login():
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
+if "page" not in st.session_state:
+    st.session_state.page = "Login"
 
 if not st.session_state.logged_in:
-    st.session_state.logged_in = login()
-    if not st.session_state.logged_in:
-        st.stop()
+    login()
+    st.stop()
 
-# -------------------- NAVIGATION --------------------
-page = st.sidebar.radio("Navigate", ["Home", "Data Entry", "Trends", "Tables"])
+# -------------------- SIDEBAR --------------------
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Navigate", ["Home", "Summary", "Data Entry", "Trends", "Tables"], index=0)
 
-# Filters
-province_filter = st.sidebar.multiselect("Province", sorted(df["Province"].unique()))
-city_filter = st.sidebar.multiselect("City/Mun", sorted(df[df["Province"].isin(province_filter)]["City/Mun"].unique()) if province_filter else sorted(df["City/Mun"].unique()))
-disease_filter = st.sidebar.selectbox("Disease Type", ["All", "Lepto Only", "Other Only"])
-aggregation = st.sidebar.selectbox("Aggregation", ["ISO Week", "7-Day Moving Average"])
+province_filter = st.sidebar.multiselect("Province", sorted(df["Province"].unique()),
+                                         default=st.session_state.get("province_filter", []))
+city_filter = st.sidebar.multiselect("City/Mun", 
+                                     sorted(df[df["Province"].isin(province_filter)]["City/Mun"].unique()) if province_filter else sorted(df["City/Mun"].unique()),
+                                     default=st.session_state.get("city_filter", []))
+disease_mode = st.sidebar.selectbox("Disease Type View", ["All (both)", "Lepto only", "Other only"],
+                                    index=["All (both)", "Lepto only", "Other only"].index(st.session_state.get("disease_mode", "All (both)")))
+aggregation = st.sidebar.selectbox("Aggregation", ["ISO Week", "7-Day Moving Average"],
+                                   index=["ISO Week", "7-Day Moving Average"].index(st.session_state.get("aggregation", "ISO Week")))
 
-# Apply filters
+col_buttons = st.sidebar.columns(2)
+if col_buttons[0].button("Clear filters"):
+    st.session_state.province_filter = []
+    st.session_state.city_filter = []
+    st.session_state.disease_mode = "All (both)"
+    st.session_state.aggregation = "ISO Week"
+    st.experimental_rerun()
+
+if col_buttons[1].button("Log out"):
+    st.session_state.logged_in = False
+    st.experimental_rerun()
+
+# -------------------- FILTERS --------------------
 def apply_filters(data):
-    filtered = data.copy()
+    d = data.copy()
     if province_filter:
-        filtered = filtered[filtered["Province"].isin(province_filter)]
+        d = d[d["Province"].isin(province_filter)]
     if city_filter:
-        filtered = filtered[filtered["City/Mun"].isin(city_filter)]
+        d = d[d["City/Mun"].isin(city_filter)]
 
-    if disease_filter == "Lepto Only":
-        filtered = filtered[
-            (filtered["No. of ICU beds Occupied due to Lepto"] > 0) &
-            (filtered["No. of ICU beds Occupied due to Other diseases"] == 0) &
-            (filtered["No. of Non-ICU Beds Occupied due to Other diseases"] == 0)
-        ]
-    elif disease_filter == "Other Only":
-        filtered = filtered[
-            (filtered["No. of ICU beds Occupied due to Other diseases"] > 0) &
-            (filtered["No. of ICU beds Occupied due to Lepto"] == 0) &
-            (filtered["No. of Non-ICU Beds Occupied due to Lepto"] == 0)
-        ]
-    return filtered
+    # Transform values instead of filtering rows
+    if disease_mode == "Lepto only":
+        d = d.assign(
+            **{
+                "Total ICU beds occupied": d["Lepto ICU"],
+                "Total Non-ICU beds occupied": d["Lepto Non-ICU"],
+                "Total beds occupied": d["Lepto ICU"] + d["Lepto Non-ICU"]
+            }
+        )
+    elif disease_mode == "Other only":
+        d = d.assign(
+            **{
+                "Total ICU beds occupied": d["Other ICU"],
+                "Total Non-ICU beds occupied": d["Other Non-ICU"],
+                "Total beds occupied": d["Other ICU"] + d["Other Non-ICU"]
+            }
+        )
+    return d
 
 filtered_df = apply_filters(df)
 
 # -------------------- HOME --------------------
 if page == "Home":
     st.title("Leptospirosis Bed Monitoring Dashboard")
-    st.write("A monitoring tool for ICU and Non-ICU bed usage in Central Luzon hospitals.")
+    st.write("Welcome to the Central Luzon Lepto Bed Monitoring System.")
+    st.write(f"Dataset covers {len(df)} records from {df['Date'].min().date()} to {df['Date'].max().date()}.")
 
-    st.subheader("Summary Panel")
-    total_icu = int(filtered_df["Total ICU beds occupied"].sum())
-    total_deaths = int(filtered_df["Died"].sum())
-    total_beds = int(filtered_df["Total beds occupied"].sum())
-    mortality = round((total_deaths / total_beds) * 100, 2) if total_beds else 0
+    st.subheader("Key Metrics")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Total Records (Filtered)", len(filtered_df))
+    col2.metric("Total ICU Occupancy", int(filtered_df["Total ICU beds occupied"].sum()))
+    mortality = round((filtered_df["Died"].sum() / filtered_df["Total beds occupied"].sum())*100, 2) if filtered_df["Total beds occupied"].sum() else 0
+    col3.metric("Mortality Rate", f"{mortality}%")
 
-    col1, col2 = st.columns(2)
-    col1.metric("Total ICU Occupancy", total_icu)
-    col2.metric("Current Mortality Rate", f"{mortality:.2f}%")
+# -------------------- SUMMARY --------------------
+elif page == "Summary":
+    st.title("Summary Panel")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("ICU Beds", int(filtered_df["Total ICU beds occupied"].sum()))
+    col2.metric("Non-ICU Beds", int(filtered_df["Total Non-ICU beds occupied"].sum()))
+    col3.metric("Total Beds", int(filtered_df["Total beds occupied"].sum()))
+    st.metric("Mortality Rate", f"{round((filtered_df['Died'].sum()/filtered_df['Total beds occupied'].sum())*100,2) if filtered_df['Total beds occupied'].sum() else 0}%")
 
 # -------------------- DATA ENTRY --------------------
 elif page == "Data Entry":
     st.title("New Data Entry (Post 24-Nov-2025 Only)")
-
     provinces = sorted(df["Province"].unique())
     cities_by_prov = df.groupby("Province")["City/Mun"].unique().to_dict()
 
@@ -116,14 +152,13 @@ elif page == "Data Entry":
         non_icu_lepto = st.number_input("Non-ICU Beds (Lepto)", min_value=0)
         non_icu_other = st.number_input("Non-ICU Beds (Other)", min_value=0)
         deaths = st.number_input("Deaths", min_value=0)
-
         submitted = st.form_submit_button("Submit")
         if submitted:
             st.success("✅ Data submitted (simulation only)")
 
 # -------------------- TRENDS --------------------
 elif page == "Trends":
-    st.title("Trends: Bed Occupancy and Deaths")
+    st.title("Trends Dashboard")
 
     if aggregation == "ISO Week":
         group = filtered_df.groupby("Week")[["Total ICU beds occupied", "Total Non-ICU beds occupied", "Died"]].sum().reset_index()
