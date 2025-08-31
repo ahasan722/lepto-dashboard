@@ -2,79 +2,74 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
-from io import BytesIO
+import datetime
 
-# Load data
+st.set_page_config(page_title="Lepto Dashboard", layout="wide")
+
 @st.cache_data
 def load_data():
-    return pd.read_csv("final_cleaned_lepto_bed_occupancy_corrected.csv", parse_dates=["Date"])
+    df = pd.read_csv("final_cleaned_lepto_bed_occupancy_corrected.csv", parse_dates=["Date"])
+    df["ISO_Week"] = df["Date"].dt.isocalendar().week
+    df["Year"] = df["Date"].dt.year
+    df["Week"] = df["Year"].astype(str) + "-W" + df["ISO_Week"].astype(str)
+    return df
 
 df = load_data()
 
-# Sidebar - Filters
+# Sidebar
 st.sidebar.title("Filters")
-province_filter = st.sidebar.multiselect("Select Province", sorted(df["Province"].unique()), default=None)
-city_filter = st.sidebar.multiselect("Select City/Mun", sorted(df["City/Mun"].unique()), default=None)
-disease_filter = st.sidebar.selectbox("Disease Type", ["All", "Lepto", "Other"])
-week_agg = st.sidebar.selectbox("Aggregation", ["ISO Week", "7-Day Moving Average"])
+selected_provinces = st.sidebar.multiselect("Province", sorted(df["Province"].unique()))
+selected_cities = st.sidebar.multiselect("City/Mun", sorted(df["City/Mun"].unique()))
+disease_type = st.sidebar.selectbox("Disease Type", ["All", "Lepto", "Other"])
+agg_method = st.sidebar.selectbox("Aggregation", ["ISO Week", "7-Day Moving Average"])
 
-# Filter data
-filtered_df = df.copy()
-if province_filter:
-    filtered_df = filtered_df[filtered_df["Province"].isin(province_filter)]
-if city_filter:
-    filtered_df = filtered_df[filtered_df["City/Mun"].isin(city_filter)]
+# Apply filters
+def apply_filters(data):
+    d = data.copy()
+    if selected_provinces:
+        d = d[d["Province"].isin(selected_provinces)]
+    if selected_cities:
+        d = d[d["City/Mun"].isin(selected_cities)]
+    if disease_type == "Lepto":
+        d = d[d["No. of ICU beds Occupied due to Lepto"] + d["No. of Non-ICU Beds Occupied due to Lepto"] > 0]
+    elif disease_type == "Other":
+        d = d[d["No. of ICU beds Occupied due to Other diseases"] + d["No. of Non-ICU Beds Occupied due to Other diseases"] > 0]
+    return d
 
-# Date Aggregation
-filtered_df["ISO_Week"] = filtered_df["Date"].dt.isocalendar().week
-filtered_df["Year"] = filtered_df["Date"].dt.year
-filtered_df["Week"] = filtered_df["Year"].astype(str) + "-W" + filtered_df["ISO_Week"].astype(str)
+filtered_df = apply_filters(df)
 
-# Header
-st.title("Leptospirosis Bed Occupancy Dashboard")
+# Trends Page
+st.title("📊 Trends: Bed Occupancy and Deaths")
 
-# Summary Panel
-col1, col2 = st.columns(2)
-with col1:
-    total_icu = filtered_df["Total ICU beds occupied"].sum()
-    st.metric("Total ICU Beds Occupied", total_icu)
-with col2:
-    total_mortality = filtered_df["% Died"].mean()
-    st.metric("Average Mortality Rate (%)", f"{total_mortality:.2f}")
+# Aggregation
+if agg_method == "ISO Week":
+    trend_data = filtered_df.groupby("Week")[["Total ICU beds occupied", "Total Non-ICU beds occupied", "Died"]].sum().reset_index()
+    x_col = "Week"
+else:
+    trend_data = filtered_df.set_index("Date").rolling("7D").sum().reset_index()
+    x_col = "Date"
 
-# Trends
+# ICU & Non-ICU Beds
 st.subheader("ICU and Non-ICU Bed Occupancy Over Time")
-if week_agg == "ISO Week":
-    trends = filtered_df.groupby("Week")[["Total ICU beds occupied", "Total Non-ICU beds occupied"]].sum().reset_index()
-    fig = px.line(trends, x="Week", y=["Total ICU beds occupied", "Total Non-ICU beds occupied"])
-else:
-    ma = filtered_df.set_index("Date").sort_index().rolling("7D").sum()[["Total ICU beds occupied", "Total Non-ICU beds occupied"]]
-    ma.reset_index(inplace=True)
-    fig = px.line(ma, x="Date", y=["Total ICU beds occupied", "Total Non-ICU beds occupied"])
+fig1 = px.line(trend_data, x=x_col, y=["Total ICU beds occupied", "Total Non-ICU beds occupied"],
+               labels={"value": "Beds Occupied", "variable": "Type"}, title="Bed Occupancy Trends")
 
-fig.update_layout(xaxis_title="Time", yaxis_title="Beds Occupied", hovermode="x unified")
-st.plotly_chart(fig, use_container_width=True)
+# ✅ Brush and zoom function (Users can click and drag to highlight a date range, then zoom out)
+fig1.update_layout(
+    hovermode="x unified",
+    xaxis=dict(rangeslider=dict(visible=True))
+)
 
-# Deaths
+st.plotly_chart(fig1, use_container_width=True)
+
+# Deaths Over Time
 st.subheader("Deaths Over Time")
-if week_agg == "ISO Week":
-    deaths = filtered_df.groupby("Week")["Died"].sum().reset_index()
-    fig2 = px.bar(deaths, x="Week", y="Died", title="Deaths per ISO Week")
-else:
-    death_ma = filtered_df.set_index("Date").sort_index().rolling("7D").sum()["Died"].reset_index()
-    fig2 = px.line(death_ma, x="Date", y="Died", title="7-Day Moving Average of Deaths")
+fig2 = px.line(trend_data, x=x_col, y="Died", title="Deaths Trend")
 
-fig2.update_layout(xaxis_title="Time", yaxis_title="Deaths", hovermode="x unified")
+# ✅ Brush and zoom function for deaths chart
+fig2.update_layout(
+    hovermode="x unified",
+    xaxis=dict(rangeslider=dict(visible=True))
+)
+
 st.plotly_chart(fig2, use_container_width=True)
-
-# Data Table
-st.subheader("Filtered Data Table")
-st.dataframe(filtered_df)
-
-# Export Option
-def convert_df(df):
-    return df.to_csv(index=False).encode("utf-8")
-
-csv = convert_df(filtered_df)
-st.download_button("Download Filtered Data as CSV", data=csv, file_name="filtered_data.csv", mime="text/csv")
