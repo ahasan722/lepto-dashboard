@@ -4,25 +4,19 @@ import pandas as pd
 import plotly.express as px
 import datetime
 
-# -------------------- CONFIG --------------------
 st.set_page_config(page_title="Lepto Bed Dashboard", layout="wide")
 
-# Custom background styling
+# Background styling
 st.markdown("""
     <style>
-        body {
-            background-color: #f4f6f9;
-        }
-        .block-container {
-            padding-top: 2rem;
-        }
+        body { background-color: #f4f6f9; }
+        .block-container { padding-top: 2rem; }
     </style>
     """, unsafe_allow_html=True)
 
 @st.cache_data
 def load_data():
     df = pd.read_csv("STC-2502958-001.csv", parse_dates=["Date"])
-    # Split disease-specific totals
     df["Lepto ICU"] = df["No. of ICU beds Occupied due to Lepto"]
     df["Other ICU"] = df["No. of ICU beds Occupied due to Other diseases"]
     df["Lepto Non-ICU"] = df["No. of Non-ICU Beds Occupied due to Lepto"]
@@ -35,7 +29,7 @@ def load_data():
 df = load_data()
 
 # -------------------- LOGIN --------------------
-def login():
+def login_view():
     st.title("Login")
     with st.form("login_form"):
         username = st.text_input("Username")
@@ -45,11 +39,9 @@ def login():
             if username == "STC-2502958-001" and password == "123456":
                 st.session_state.logged_in = True
                 st.session_state.page = "Home"
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("Invalid credentials")
-                return False
-    return False
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -57,7 +49,7 @@ if "page" not in st.session_state:
     st.session_state.page = "Login"
 
 if not st.session_state.logged_in:
-    login()
+    login_view()
     st.stop()
 
 # -------------------- SIDEBAR --------------------
@@ -80,11 +72,11 @@ if col_buttons[0].button("Clear filters"):
     st.session_state.city_filter = []
     st.session_state.disease_mode = "All (both)"
     st.session_state.aggregation = "ISO Week"
-    st.experimental_rerun()
+    st.rerun()
 
 if col_buttons[1].button("Log out"):
     st.session_state.logged_in = False
-    st.experimental_rerun()
+    st.rerun()
 
 # -------------------- FILTERS --------------------
 def apply_filters(data):
@@ -93,8 +85,6 @@ def apply_filters(data):
         d = d[d["Province"].isin(province_filter)]
     if city_filter:
         d = d[d["City/Mun"].isin(city_filter)]
-
-    # Transform values instead of filtering rows
     if disease_mode == "Lepto only":
         d = d.assign(
             **{
@@ -142,7 +132,6 @@ elif page == "Data Entry":
     st.title("New Data Entry (Post 24-Nov-2025 Only)")
     provinces = sorted(df["Province"].unique())
     cities_by_prov = df.groupby("Province")["City/Mun"].unique().to_dict()
-
     with st.form("entry_form", clear_on_submit=True):
         date = st.date_input("Date", min_value=datetime.date(2025, 11, 25))
         province = st.selectbox("Province", provinces)
@@ -159,7 +148,6 @@ elif page == "Data Entry":
 # -------------------- TRENDS --------------------
 elif page == "Trends":
     st.title("Trends Dashboard")
-
     if aggregation == "ISO Week":
         group = filtered_df.groupby("Week")[["Total ICU beds occupied", "Total Non-ICU beds occupied", "Died"]].sum().reset_index()
         x = "Week"
@@ -183,6 +171,5 @@ elif page == "Trends":
 elif page == "Tables":
     st.title("Filtered Data Table")
     st.dataframe(filtered_df)
-
     csv = filtered_df.to_csv(index=False).encode("utf-8")
     st.download_button("Download Filtered Data (CSV)", data=csv, file_name="filtered_lepto_data.csv", mime="text/csv")
