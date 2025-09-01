@@ -15,16 +15,20 @@ st.markdown("""
 
 @st.cache_data
 def load_data():
-    url = "https://raw.githubusercontent.com/ahasn722/lepto-dashboard/main/STC-2502958-001.csv"
-    df = pd.read_csv(url, parse_dates=["Date"])
-    df["Lepto ICU"] = df["No. of ICU beds Occupied due to Lepto"]
-    df["Other ICU"] = df["No. of ICU beds Occupied due to Other diseases"]
-    df["Lepto Non-ICU"] = df["No. of Non-ICU Beds Occupied due to Lepto"]
-    df["Other Non-ICU"] = df["No. of Non-ICU Beds Occupied due to Other diseases"]
-    df["ISO_Week"] = df["Date"].dt.isocalendar().week
-    df["Year"] = df["Date"].dt.year
-    df["Week"] = df["Year"].astype(str) + "-W" + df["ISO_Week"].astype(str)
-    return df
+    try:
+        url = "https://raw.githubusercontent.com/ahasan722/lepto-dashboard/main/STC-2502958-001.csv"
+        df = pd.read_csv(url, parse_dates=["Date"])
+        df["Lepto ICU"] = df["No. of ICU beds Occupied due to Lepto"]
+        df["Other ICU"] = df["No. of ICU beds Occupied due to Other diseases"]
+        df["Lepto Non-ICU"] = df["No. of Non-ICU Beds Occupied due to Lepto"]
+        df["Other Non-ICU"] = df["No. of Non-ICU Beds Occupied due to Other diseases"]
+        df["ISO_Week"] = df["Date"].dt.isocalendar().week
+        df["Year"] = df["Date"].dt.year
+        df["Week"] = df["Year"].astype(str) + "-W" + df["ISO_Week"].astype(str)
+        return df
+    except Exception as e:
+        st.error(f"❌ Failed to load or parse data: {e}")
+        st.stop()
 
 df = load_data()
 
