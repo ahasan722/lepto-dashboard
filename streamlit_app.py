@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import datetime
-import requests
-from io import StringIO
 
 st.set_page_config(page_title="Lepto Bed Dashboard", layout="wide")
 
@@ -18,12 +16,7 @@ st.markdown("""
 @st.cache_data
 def load_data():
     url = "https://raw.githubusercontent.com/ahasn722/lepto-dashboard/main/STC-2502958-001.csv"
-    response = requests.get(url)
-    if response.status_code != 200:
-        st.error("Failed to load data from GitHub")
-        st.stop()
-    data = StringIO(response.text)
-    df = pd.read_csv(data, parse_dates=["Date"])
+    df = pd.read_csv(url, parse_dates=["Date"])
     df["Lepto ICU"] = df["No. of ICU beds Occupied due to Lepto"]
     df["Other ICU"] = df["No. of ICU beds Occupied due to Other diseases"]
     df["Lepto Non-ICU"] = df["No. of Non-ICU Beds Occupied due to Lepto"]
