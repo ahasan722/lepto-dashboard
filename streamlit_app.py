@@ -1,8 +1,9 @@
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 import datetime
+import requests
+from io import StringIO
 
 st.set_page_config(page_title="Lepto Bed Dashboard", layout="wide")
 
@@ -16,7 +17,13 @@ st.markdown("""
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("STC-2502958-001.csv", parse_dates=["Date"])
+    url = "https://raw.githubusercontent.com/ahasn722/lepto-dashboard/main/STC-2502958-001.csv"
+    response = requests.get(url)
+    if response.status_code != 200:
+        st.error("Failed to load data from GitHub")
+        st.stop()
+    data = StringIO(response.text)
+    df = pd.read_csv(data, parse_dates=["Date"])
     df["Lepto ICU"] = df["No. of ICU beds Occupied due to Lepto"]
     df["Other ICU"] = df["No. of ICU beds Occupied due to Other diseases"]
     df["Lepto Non-ICU"] = df["No. of Non-ICU Beds Occupied due to Lepto"]
@@ -36,9 +43,13 @@ def login_view():
         password = st.text_input("Password", type="password")
         submitted = st.form_submit_button("Login")
         if submitted:
-            if username == "STC-2502958-001" and password == "123456":
+            if username == st.secrets["login"]["username"] and password == st.secrets["login"]["password"]:
                 st.session_state.logged_in = True
                 st.session_state.page = "Home"
+                st.session_state.province_filter = []
+                st.session_state.city_filter = []
+                st.session_state.disease_mode = "All (both)"
+                st.session_state.aggregation = "ISO Week"
                 st.rerun()
             else:
                 st.error("Invalid credentials")
@@ -99,6 +110,14 @@ def apply_filters(data):
                 "Total ICU beds occupied": d["Other ICU"],
                 "Total Non-ICU beds occupied": d["Other Non-ICU"],
                 "Total beds occupied": d["Other ICU"] + d["Other Non-ICU"]
+            }
+        )
+    else:
+        d = d.assign(
+            **{
+                "Total ICU beds occupied": d["Lepto ICU"] + d["Other ICU"],
+                "Total Non-ICU beds occupied": d["Lepto Non-ICU"] + d["Other Non-ICU"],
+                "Total beds occupied": d["Lepto ICU"] + d["Other ICU"] + d["Lepto Non-ICU"] + d["Other Non-ICU"]
             }
         )
     return d
